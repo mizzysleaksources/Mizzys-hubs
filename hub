@@ -1,12 +1,13 @@
--- Mizzys Hub GUI with Sections (Revamped Colors & Active Tab Highlight)
+-- Mizzys Hub GUI with Sections (Revamped Colors & Smooth Animated Tabs)
 -- Roblox LocalScript
 
 local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
-local UserInputService = game:GetService("UserInputService")
 
--- ScreenGui
+-- SCREEN GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MizzysHub"
 ScreenGui.ResetOnSpawn = false
@@ -29,7 +30,7 @@ TopBar.BorderSizePixel = 0
 TopBar.Parent = Main
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 14)
 
--- Cover bottom corners
+-- COVER BOTTOM CORNERS
 local Cover = Instance.new("Frame")
 Cover.Size = UDim2.new(1, 0, 0.5, 0)
 Cover.Position = UDim2.new(0, 0, 0.5, 0)
@@ -43,13 +44,13 @@ Title.Size = UDim2.new(1, -60, 1, 0)
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "Mizzys Hub"
-Title.TextColor3 = Color3.fromRGB(255, 165, 0) -- bright orange
+Title.TextColor3 = Color3.fromRGB(255, 165, 0)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = TopBar
 
--- X BUTTON
+-- CLOSE BUTTON
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 30, 0, 30)
 CloseBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -81,9 +82,8 @@ Content.Position = UDim2.new(0, 120, 0, 40)
 Content.BackgroundTransparency = 1
 Content.Parent = Main
 
--- SECTION CREATOR
+-- PAGES CREATOR
 local Pages = {}
-
 local function createPage(name)
 	local page = Instance.new("Frame")
 	page.Size = UDim2.new(1, 0, 1, 0)
@@ -111,7 +111,6 @@ createPage("Player")
 createPage("Visuals")
 createPage("Misc")
 createPage("Credits")
-
 Pages.Home.Visible = true
 
 -- HOME TEXT
@@ -128,19 +127,26 @@ HomeText.TextColor3 = Color3.fromRGB(200, 200, 200)
 HomeText.Text = "Made by Mizzy\nJoin for more: discord.gg/PMJ6NjZGh4"
 HomeText.Parent = Pages.Home
 
--- HOVER EFFECT FUNCTION
+-- HOVER FUNCTION
 local function hover(btn)
 	btn.MouseEnter:Connect(function()
-		btn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+		TweenService:Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			BackgroundColor3 = Color3.fromRGB(60,60,60),
+			Size = UDim2.new(1, -5, 0, 40)
+		}):Play()
 	end)
 	btn.MouseLeave:Connect(function()
-		btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+		if btn ~= activeButton then
+			TweenService:Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				BackgroundColor3 = Color3.fromRGB(50,50,50),
+				Size = UDim2.new(1, -10, 0, 36)
+			}):Play()
+		end
 	end)
 end
 
--- 🔥 PLAYER BUTTONS
-
--- Jump Button
+-- PLAYER BUTTONS
+-- Jump
 local JumpBtn = Instance.new("TextButton")
 JumpBtn.Size = UDim2.new(0, 180, 0, 40)
 JumpBtn.Position = UDim2.new(0, 20, 0, 60)
@@ -153,14 +159,13 @@ JumpBtn.BorderSizePixel = 0
 JumpBtn.Parent = Pages.Player
 Instance.new("UICorner", JumpBtn).CornerRadius = UDim.new(0, 10)
 hover(JumpBtn)
-
 JumpBtn.MouseButton1Click:Connect(function()
 	loadstring(game:HttpGet(
 		"https://raw.githubusercontent.com/mizzysleaksources/mizzys-jump/refs/heads/main/mizzys%20jumpo"
 	))()
 end)
 
--- Mizzys TP Button
+-- Mizzys TP
 local TPBtn = Instance.new("TextButton")
 TPBtn.Size = UDim2.new(0, 180, 0, 40)
 TPBtn.Position = UDim2.new(0, 20, 0, 110)
@@ -173,14 +178,13 @@ TPBtn.BorderSizePixel = 0
 TPBtn.Parent = Pages.Player
 Instance.new("UICorner", TPBtn).CornerRadius = UDim.new(0, 10)
 hover(TPBtn)
-
 TPBtn.MouseButton1Click:Connect(function()
 	loadstring(game:HttpGet(
 		"https://raw.githubusercontent.com/mizzysleaksources/mizzys-tp/refs/heads/main/mizzys%20tp%20script"
 	))()
 end)
 
--- Tall Like Mizzy Button (toggleable)
+-- Tall Like Mizzy
 local tallEnabled = false
 local TallBtn = Instance.new("TextButton")
 TallBtn.Size = UDim2.new(0, 180, 0, 40)
@@ -194,19 +198,17 @@ TallBtn.BorderSizePixel = 0
 TallBtn.Parent = Pages.Player
 Instance.new("UICorner", TallBtn).CornerRadius = UDim.new(0, 10)
 hover(TallBtn)
-
 TallBtn.MouseButton1Click:Connect(function()
 	local character = player.Character
 	if not character then return end
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
 	if not humanoid then return end
-
 	tallEnabled = not tallEnabled
 	humanoid.HipHeight = tallEnabled and 20 or 10
 	TallBtn.Text = tallEnabled and "Normal Height" or "Tall Like Mizzy"
 end)
 
--- Miz Speed Button
+-- Miz Speed
 local SpeedBtn = Instance.new("TextButton")
 SpeedBtn.Size = UDim2.new(0, 180, 0, 40)
 SpeedBtn.Position = UDim2.new(0, 20, 0, 210)
@@ -219,14 +221,11 @@ SpeedBtn.BorderSizePixel = 0
 SpeedBtn.Parent = Pages.Player
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 10)
 hover(SpeedBtn)
-
 SpeedBtn.MouseButton1Click:Connect(function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/mizzysleaksources/mizzys-speed-/refs/heads/main/BIG%20MIZ%20SPEED"))()
 end)
 
 -- VISUALS BUTTONS
-
--- ESP Button
 local ESPBtn = Instance.new("TextButton")
 ESPBtn.Size = UDim2.new(0, 180, 0, 40)
 ESPBtn.Position = UDim2.new(0, 20, 0, 60)
@@ -239,16 +238,11 @@ ESPBtn.BorderSizePixel = 0
 ESPBtn.Parent = Pages.Visuals
 Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, 10)
 hover(ESPBtn)
-
 ESPBtn.MouseButton1Click:Connect(function()
 	loadstring(game:HttpGet("https://pastebin.com/raw/g2vpLPP2", true))()
 end)
 
 -- MISC BUTTONS
-local NoClipEnabled = false
-local FlyEnabled = false
-local BigHeadEnabled = false
-
 -- No Clip
 local NoClipBtn = Instance.new("TextButton")
 NoClipBtn.Size = UDim2.new(0, 180, 0, 40)
@@ -266,7 +260,7 @@ NoClipBtn.MouseButton1Click:Connect(function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/mizzysleaksources/mizzys-noclip/main/noclip"))()
 end)
 
--- Fly
+-- Fly (UPDATED SCRIPT)
 local FlyBtn = Instance.new("TextButton")
 FlyBtn.Size = UDim2.new(0, 180, 0, 40)
 FlyBtn.Position = UDim2.new(0, 20, 0, 110)
@@ -280,7 +274,7 @@ FlyBtn.Parent = Pages.Misc
 Instance.new("UICorner", FlyBtn).CornerRadius = UDim.new(0, 10)
 hover(FlyBtn)
 FlyBtn.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/mizzysleaksources/mizzys-fly/main/fly"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/mizzysleaksources/mizzys-fly-/refs/heads/main/fly%20lol"))()
 end)
 
 -- Big Head
@@ -303,14 +297,12 @@ end)
 -- SIDEBAR BUTTONS
 local layout = Instance.new("UIListLayout", Sidebar)
 layout.Padding = UDim.new(0, 6)
-
 local pad = Instance.new("UIPadding", Sidebar)
 pad.PaddingTop = UDim.new(0, 10)
 
--- Active tab highlighting
+-- ACTIVE TAB
 local activeButton = nil
-
-local function createTab(name)
+local function createSidebarTab(name)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(1, -10, 0, 36)
 	btn.Position = UDim2.new(0, 5, 0, 0)
@@ -323,15 +315,22 @@ local function createTab(name)
 	btn.Parent = Sidebar
 	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 
-	-- Hover effect for sidebar buttons
+	-- Hover animations
 	btn.MouseEnter:Connect(function()
 		if btn ~= activeButton then
-			btn.BackgroundColor3 = Color3.fromRGB(65,65,65)
+			TweenService:Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				BackgroundColor3 = Color3.fromRGB(65,65,65),
+				Size = UDim2.new(1, -5, 0, 40)
+			}):Play()
 		end
 	end)
+
 	btn.MouseLeave:Connect(function()
 		if btn ~= activeButton then
-			btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+			TweenService:Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				BackgroundColor3 = Color3.fromRGB(50,50,50),
+				Size = UDim2.new(1, -10, 0, 36)
+			}):Play()
 		end
 	end)
 
@@ -341,25 +340,34 @@ local function createTab(name)
 		end
 		Pages[name].Visible = true
 
-		if activeButton then
-			activeButton.BackgroundColor3 = Color3.fromRGB(50,50,50)
+		if activeButton and activeButton ~= btn then
+			-- shrink previous active button smoothly
+			TweenService:Create(activeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				BackgroundColor3 = Color3.fromRGB(50,50,50),
+				Size = UDim2.new(1, -10, 0, 36)
+			}):Play()
 		end
-		btn.BackgroundColor3 = Color3.fromRGB(100,100,100)
+
+		-- highlight current active button smoothly
+		TweenService:Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			BackgroundColor3 = Color3.fromRGB(100,100,100),
+			Size = UDim2.new(1, -5, 0, 40)
+		}):Play()
 		activeButton = btn
 	end)
 end
 
--- CREATE TABS
-createTab("Home")
-createTab("Player")
-createTab("Visuals")
-createTab("Misc")
-createTab("Credits")
+-- CREATE SIDEBAR TABS
+createSidebarTab("Home")
+createSidebarTab("Player")
+createSidebarTab("Visuals")
+createSidebarTab("Misc")
+createSidebarTab("Credits")
 
--- CREDITS TEXT (Moved lower)
+-- CREDITS TEXT
 local CreditsText = Instance.new("TextLabel")
 CreditsText.Size = UDim2.new(1, -20, 1, -20)
-CreditsText.Position = UDim2.new(0, 10, 0, 60) -- <-- changed from 10 to 60
+CreditsText.Position = UDim2.new(0, 10, 0, 60)
 CreditsText.BackgroundTransparency = 1
 CreditsText.TextWrapped = true
 CreditsText.TextXAlignment = Enum.TextXAlignment.Left
@@ -373,7 +381,6 @@ CreditsText.Parent = Pages.Credits
 -- DRAG FUNCTIONALITY (TOPBAR ONLY)
 local dragging = false
 local dragInput, dragStart, startPos
-
 local function update(input)
 	local delta = input.Position - dragStart
 	Main.Position = UDim2.new(
@@ -389,7 +396,6 @@ TopBar.InputBegan:Connect(function(input)
 		dragging = true
 		dragStart = input.Position
 		startPos = Main.Position
-
 		input.Changed:Connect(function()
 			if input.UserInputState == Enum.UserInputState.End then
 				dragging = false
